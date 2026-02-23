@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS entries (
+	id 		INTEGER PRIMARY KEY AUTOINCREMENT,
+	source 		TEXT NOT NULL,
+	target 		TEXT NOT NULL,
+	amount 		REAL(8) NOT NULL,
+	description 	TEXT
+)
