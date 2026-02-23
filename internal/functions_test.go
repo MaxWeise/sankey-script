@@ -13,6 +13,7 @@ func TestCreateEntryUniqueId(t *testing.T) {
 	underTest, err := setupTestService()
 	if err != nil {
 		t.Errorf("Setting up the test raised an error: %s", err)
+		return
 	}
 
 	// Run Tests
@@ -36,6 +37,7 @@ func TestCreateEntry(t *testing.T) {
 	underTest, err := setupTestService()
 	if err != nil {
 		t.Errorf("Setting up the test raised an error: %s", err)
+		return
 	}
 
 	// Run tests
@@ -69,6 +71,7 @@ func TestCreateEntryWithDescription(t *testing.T) {
 	underTest, err := setupTestService()
 	if err != nil {
 		t.Errorf("Setting up the test raised an error: %s", err)
+		return
 	}
 
 	// Run tests
@@ -98,6 +101,27 @@ func TestCreateEntryWithDescription(t *testing.T) {
 
 	if actual.Description.String != "Test Description" {
 		t.Errorf("The object does not the correct value for Description.\nExpected: Test Description\nActual: %s", actual.Description.String)
+	}
+}
+
+func TestReadEntries(t *testing.T) {
+	// arrange
+	underTest, err := setupTestService()
+	if err != nil {
+		t.Errorf("Setting up the test raised an error: %s", err)
+		return
+	}
+	_, _ = underTest.CreateEntry("Gehalt", "Einnahmen", 100, "Test Description")
+
+	// Run test
+	actual, err := underTest.ReadAllEntries()
+	if err != nil {
+		t.Errorf("Someting went wrong: %s", err)
+	}
+
+	// Assert
+	if len(actual) == 0 {
+		t.Error("The read function did not return any values.")
 	}
 }
 

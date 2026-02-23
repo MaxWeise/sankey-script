@@ -36,6 +36,11 @@ func (s CoreService) CreateEntry(source string, target string, amount float32, d
 	return o, nil
 }
 
+// Read all entries from the database
+func (s CoreService) ReadAllEntries() ([]data_acess.Entry, error) {
+	return s.repository.GetAllEntries(s.ctx)
+}
+
 //go:embed schema.sql
 var schema string
 
