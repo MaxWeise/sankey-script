@@ -2,6 +2,8 @@ package internal
 
 import (
 	"context"
+	"database/sql"
+	"maxweise/sankey-script/data_acess"
 	"testing"
 
 	_ "modernc.org/sqlite"
@@ -104,6 +106,7 @@ func TestCreateEntryWithDescription(t *testing.T) {
 	}
 }
 
+// Test that all entries get retrieved from the database.
 func TestReadEntries(t *testing.T) {
 	// arrange
 	underTest, err := setupTestService()
@@ -122,6 +125,46 @@ func TestReadEntries(t *testing.T) {
 	// Assert
 	if len(actual) == 0 {
 		t.Error("The read function did not return any values.")
+	}
+}
+
+// All attributes should handle change values correctly.
+func TestChangeEntry(t *testing.T) {
+	// arrange
+	underTest, err := setupTestService()
+	if err != nil {
+		t.Errorf("Setting up the test raised an error: %s", err)
+		return
+	}
+	o, _ := underTest.CreateEntry("Gehalt", "Einnahmen", 100, "Test Description")
+
+	// Run test
+	actual, err := underTest.ChangeEntry(
+		o.ID,
+		"TestString",
+		"",
+		sql.NullFloat64{Valid: false},
+		sql.NullString{Valid: true, String: "Eine neue Beschreibung"},
+	)
+
+	// Assert
+	if err != nil {
+		t.Errorf("There has been an error while testing: %s", err)
+	}
+
+	expected := data_acess.Entry{
+		ID:     o.ID,
+		Source: "TestString",
+		Target: "Einnahmen",
+		Amount: float64(100),
+		Description: sql.NullString{
+			String: "Eine neue Beschreibung",
+			Valid:  true,
+		},
+	}
+
+	if actual != expected {
+		t.Errorf("\nExpected: \t%#v\nGot: \t\t%#v", expected, actual)
 	}
 }
 

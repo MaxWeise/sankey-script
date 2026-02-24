@@ -36,6 +36,47 @@ func (s CoreService) CreateEntry(source string, target string, amount float32, d
 	return o, nil
 }
 
+func (s CoreService) ChangeEntry(
+	id int64,
+	newSource string,
+	newTarget string,
+	amount sql.NullFloat64,
+	description sql.NullString,
+) (data_acess.Entry, error) {
+	existing, err := s.repository.GetEntry(s.ctx, id)
+
+	if err != nil {
+		return data_acess.Entry{}, err
+	}
+
+	params := data_acess.UpdateEntryParams{
+		Source:      newSource,
+		Target:      newTarget,
+		Amount:      amount.Value,
+		Description: description,
+		ID:          id,
+	}
+	if newSource == "" {
+		params.Source = existing.Source
+	}
+
+	if newTarget == "" {
+		params.Target = existing.Target
+	}
+
+	if !amount.Valid {
+		params.Amount = existing.Amount
+	}
+
+	o, err := s.repository.UpdateEntry(s.ctx, params)
+
+	if err != nil {
+		return data_acess.Entry{}, err
+	}
+
+	return o, nil
+}
+
 // Read all entries from the database
 func (s CoreService) ReadAllEntries() ([]data_acess.Entry, error) {
 	return s.repository.GetAllEntries(s.ctx)
